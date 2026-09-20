@@ -29,6 +29,15 @@ export async function installMacOSIcon(appBundle) {
       cp(iconSourcePath, iconDocument, { recursive: true }),
       mkdir(outputDirectory, { recursive: true }),
     ])
+    try {
+      await execFileAsync('xcrun', ['--find', 'actool'])
+    } catch {
+      // actool ships with full Xcode, not the Command Line Tools. The icon is
+      // cosmetic, so a missing asset compiler must not stop the dev app.
+      console.warn('[desktop] skipping the app icon: xcrun actool is unavailable')
+      return
+    }
+
     await execFileAsync('xcrun', [
       'actool',
       iconDocument,
