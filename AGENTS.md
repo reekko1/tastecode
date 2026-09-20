@@ -19,30 +19,30 @@ and resolving conflicts without rewriting published history. Do not un-park a pr
 `archive/rust-rewrite-2026-08-15`; do not merge it back into `main` without Leon saying so.
 [docs/dashboard.html](./docs/dashboard.html) is the release checklist.
 
-**Fork model (Rakan, 2026-09-20) — fork-local, lives only on `ours`:** this clone is a fork,
-not Leon's repo. `upstream` is `Leonxlnx/tastecode`, fetch only, with its push url set to
-`no_push`; `origin` is `reekko1/tastecode` and takes every push. `main` is a pristine mirror
-of `upstream/main` — never commit to it, it moves only by `git merge --ff-only
-upstream/main`. `ours` is the integration branch and stands in for main in this checkout.
-Work meant for Leon branches off `main` and opens its PR against `Leonxlnx/tastecode`; work
-that is only ours branches off `ours` and merges back into `ours`. Branching upstream-bound
-work off `ours` would drag our divergence into that PR. This section is deliberately absent
-from `main`, so a branch cut for upstream never carries it.
+**Fork model (Rakan, 2026-09-20) — fork-local:** this clone is a fork of
+`Leonxlnx/tastecode` and nothing goes back upstream. `upstream` is Leon's repo, fetch only,
+with its push url set to `no_push`; `origin` is `reekko1/tastecode` and takes every push.
+The connection to upstream exists for exactly one purpose: pulling Leon's updates in.
+
+There is no local `main`. `ours` is the only long-lived branch and stands in for main in
+this checkout — everything branches off `ours` and merges back into `ours`. The branch model
+described above is Leon's, for his repo; read it as upstream context, not as instructions
+for this checkout.
 
 **The ritual** is `git sync`, a local alias in `.git/config` rather than a tracked script:
 
 ```
 git fetch upstream --prune
-git switch main && git merge --ff-only upstream/main && git push origin main
-git switch ours && git merge main && git push origin ours
+git switch ours && git merge upstream/main && git push origin ours
 # then back to the branch you started on
 ```
 
-It needs a clean working tree — with uncommitted changes the first switch fails and the
-chain stops before anything moves. On a conflict it halts on `ours` mid-merge and pushes
-nothing: resolve, commit, `git push origin ours`. Never rebase either branch and never
-force-push one; the hard rule below applies here too, and `ours` carries merge commits from
-`main` by design.
+It needs a clean working tree — with uncommitted changes the switch fails and the chain
+stops before anything moves. On a conflict it halts on `ours` mid-merge and pushes nothing:
+resolve, commit, `git push origin ours`. Never rebase `ours` and never force-push it; the
+hard rule below applies here too, and `ours` carries merge commits from `upstream/main` by
+design. `upstream/main` stays available as a reference — `git diff upstream/main...ours`
+shows our divergence, and `git switch --detach upstream/main` gives a pristine upstream tree.
 
 ## Read first
 
