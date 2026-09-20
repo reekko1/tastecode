@@ -11,7 +11,7 @@ import path from 'node:path'
 
 const MAX_ENTRIES = 25_000
 const MAX_DEPTH = 40
-const OPAQUE_DIRECTORIES = new Set(['node_modules', '.pnpm-store'])
+const OPAQUE_DIRECTORIES = new Set(['node_modules', '.pnpm-store', '.turbo'])
 
 export interface WorkspaceEntry {
   relative: string

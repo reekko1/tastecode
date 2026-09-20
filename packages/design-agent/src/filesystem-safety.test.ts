@@ -130,6 +130,18 @@ describe('Design filesystem boundaries', () => {
     },
   )
 
+  it('walks past a build cache instead of spending the entry budget on it', () => {
+    const root = workspace()
+    writeFileSync(path.join(root, 'index.html'), '<html></html>')
+    mkdirSync(path.join(root, '.turbo', 'cache'), { recursive: true })
+    for (let index = 0; index < 64; index += 1)
+      writeFileSync(path.join(root, '.turbo', 'cache', `${index}.tar.zst`), '')
+    expect(workspaceEntries(root)).toEqual([
+      { relative: '.turbo/', file: false },
+      { relative: 'index.html', file: true },
+    ])
+  })
+
   it('fails on excessive nesting instead of skipping files', () => {
     const root = workspace()
     mkdirSync(path.join(root, ...Array.from({ length: 42 }, () => 'a')), { recursive: true })
